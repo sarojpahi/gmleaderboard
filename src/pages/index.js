@@ -5,15 +5,12 @@ import axios from "axios";
 export default function Home() {
   const [data, setData] = useState();
   const [page, setPage] = useState(1);
-  const limit = 15;
 
   const getData = () => {
     axios
-      .get(
-        `http://3.112.193.149/gmuser/leaderboard?skip=${
-          limit * (page - 1)
-        }&limit=${limit}`
-      )
+      .post(`/api/leaderboard`, {
+        page,
+      })
       .then((res) => setData(res.data))
       .catch((e) => console.log(e));
   };
@@ -90,7 +87,7 @@ export default function Home() {
             <button
               className="px-4 py-2 ml-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
               onClick={handleNextPage}
-              disabled={!data?.length || data.length < limit}
+              disabled={!data?.length || data?.length < 15}
             >
               Next
             </button>
