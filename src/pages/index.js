@@ -1,11 +1,36 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import Head from "next/head";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function Home() {
+  const [data, setData] = useState();
+  const [page, setPage] = useState(1);
+  const limit = 15;
+
+  const getData = () => {
+    axios
+      .get(
+        `http://3.112.193.149/gmuser/leaderboard?skip=${
+          limit * (page - 1)
+        }&limit=${limit}`
+      )
+      .then((res) => setData(res.data))
+      .catch((e) => console.log(e));
+  };
+
+  useEffect(() => {
+    getData();
+  }, [page]);
+
+  const handlePrevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    setPage(page + 1);
+  };
   return (
     <>
       <Head>
@@ -14,110 +39,64 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+      <main>
+        <div className="p-4">
+          <Head>
+            <title>Leaderboard</title>
+          </Head>
+          <h1 className="text-3xl font-bold mb-4 text-center">
+            GMCHAD Leaderboard
+          </h1>
+          <table className="w-full rounded-lg overflow-hidden bg-white shadow-md">
+            <thead className="bg-gray-50">
+              <tr className="border-b border-gray-200">
+                <th className="text-left text-gray-500 uppercase tracking-wider py-3 px-4 cursor-pointer">
+                  Rank
+                </th>
+                <th className="text-left text-gray-500 uppercase tracking-wider py-3 px-4 cursor-pointer">
+                  Name
+                </th>
+                <th className="text-left text-gray-500 uppercase tracking-wider py-3 px-4 cursor-pointer">
+                  Score
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.map(
+                ({ Rank, discord_id, discord_name, gm_streak }, index) => (
+                  <tr
+                    key={discord_id}
+                    className={`${
+                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                    } border-b border-gray-200`}
+                  >
+                    <td className="text-gray-600 py-3 px-4">{Rank}</td>
+                    <td className="text-gray-600 py-3 px-4">{discord_name}</td>
+                    <td className="text-gray-600 py-3 px-4">{gm_streak}</td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+          <div className="flex justify-center mt-4 items-center">
+            <button
+              className="px-4 py-2 mr-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+              onClick={handlePrevPage}
+              disabled={page <= 1}
             >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
+              Prev
+            </button>
+            <div className="px-1">{page}</div>
+            <button
+              className="px-4 py-2 ml-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+              onClick={handleNextPage}
+              disabled={!data?.length || data.length < limit}
+            >
+              Next
+            </button>
           </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
         </div>
       </main>
     </>
-  )
+  );
 }
